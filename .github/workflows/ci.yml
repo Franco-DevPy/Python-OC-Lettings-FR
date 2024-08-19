@@ -101,3 +101,15 @@ jobs:
           DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
         run: |
           docker run -d --name django-app-prod -p 8000:8000 $DOCKER_USERNAME/django-app:latest
+
+      - name: Wait for Docker container to be ready
+        run: |
+          sleep 10
+
+      - name: Collect static files
+        run: |
+          docker exec django-app-prod python manage.py collectstatic --noinput
+
+      - name: Run database migrations
+        run: |
+          docker exec django-app-prod python manage.py migrate
