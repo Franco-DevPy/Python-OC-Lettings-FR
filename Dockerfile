@@ -11,7 +11,7 @@ COPY requirements.txt /app/
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Copier le reste de l'application dans le répertoire de travail
-COPY . /app/
+COPY . .
 
 # Définir les variables d'environnement
 ENV PYTHONUNBUFFERED=1
@@ -20,4 +20,4 @@ ENV PYTHONUNBUFFERED=1
 EXPOSE 8000
 
 # Lancer le serveur Django
-CMD ["gunicorn", "--bind", "0.0.0.0:8000", "oc_lettings_site.wsgi:application"]
+CMD ["gunicorn", "--bind", "0.0.0.0:$PORT", "oc_lettings_site.wsgi:application"]
