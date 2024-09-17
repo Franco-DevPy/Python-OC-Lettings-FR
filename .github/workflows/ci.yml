@@ -104,8 +104,8 @@ jobs:
 
       - name: Build and Push Docker image to Docker Hub
         run: |
-          docker build -t your-dockerhub-username/your-image-name .
-          docker push your-dockerhub-username/your-image-name
+          docker build -t  mickaelfio/django-app:latest .
+          docker push  mickaelfio/django-app:latest
 
       - name: Install Heroku CLI
         run: |
@@ -121,7 +121,7 @@ jobs:
         env:
           HEROKU_APP_NAME: ${{ secrets.HEROKU_APP_NAME }}
         run: |
-          docker tag your-dockerhub-username/your-image-name registry.heroku.com/${HEROKU_APP_NAME}/web
+          docker tag mickaelfio/django-app:latest registry.heroku.com/${HEROKU_APP_NAME}/web
           docker push registry.heroku.com/${HEROKU_APP_NAME}/web
 
       - name: Release Docker image on Heroku
