@@ -90,41 +90,32 @@ jobs:
     needs: build-and-push-docker-image
     if: github.ref == 'refs/heads/deploy-prod'
     steps:
-      - name: Checkout code
+      # Check-out your repository.
+      - name: Checkout
         uses: actions/checkout@v2
 
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v1
+      # Build, Push and Release a Docker container to Heroku.
+      - name: Build, Push and Release a Docker container to Heroku
+        uses: gonuit/heroku-docker-deploy@v1.3.3
+        with:
+          email: ${{ secrets.HEROKU_EMAIL }}
+          heroku_api_key: ${{ secrets.HEROKU_API_KEY }}
+          heroku_app_name: ${{ secrets.HEROKU_APP_NAME }}
+          dockerfile_directory: ./
+          dockerfile_name: Dockerfile
+          process_type: web
 
-      - name: Install Heroku CLI
-        run: |
-          curl https://cli-assets.heroku.com/install.sh | sh
-
-      - name: Login to Heroku Container Registry
-        env:
-          HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
-        run: |
-          echo "$HEROKU_API_KEY" | docker login --username=_ --password-stdin registry.heroku.com
-
-      - name: Build and Push Docker image to Heroku
-        env:
-          HEROKU_APP_NAME: ${{ secrets.HEROKU_APP_NAME }}
-        run: |
-          docker build -t registry.heroku.com/${HEROKU_APP_NAME}/web .
-          docker push registry.heroku.com/${HEROKU_APP_NAME}/web
-
-      - name: Release Docker image on Heroku
-        run: |
-          heroku container:release web --app ${{ secrets.HEROKU_APP_NAME }}
-
+      # Wait for Heroku app to be ready
       - name: Wait for Heroku app to be ready
         run: |
-          sleep 10
+          sleep 20  # Pause to give time for Heroku to start the app
 
+      # Collect static files
       - name: Collect static files
         run: |
           heroku run --app ${{ secrets.HEROKU_APP_NAME }} "python manage.py collectstatic --noinput"
 
+      # Run database migrations
       - name: Run database migrations
         run: |
-          heroku run python manage.py migrate --app ${{ secrets.HEROKU_APP_NAME }}
+          heroku run --app ${{ secrets.HEROKU_APP_NAME }} "python manage.py migrate"
