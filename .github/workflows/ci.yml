@@ -90,30 +90,38 @@ jobs:
     needs: build-and-push-docker-image
     if: github.ref == 'refs/heads/deploy-prod'
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v2
-
-      - name: Log in to Docker Hub
-        run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
-
-      - name: Build Docker image
-        run: docker build -t registry.heroku.com/${{ secrets.HEROKU_APP_NAME }}/web .
-
+      - name: Checkout code
+        uses: actions/checkout@v3
+      
       - name: Install Heroku CLI
         run: |
           curl https://cli-assets.heroku.com/install.sh | sh
-
+      
       - name: Log in to Heroku Container Registry
         env:
           HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
         run: |
-          echo "$HEROKU_API_KEY" | docker login --username=_ --password-stdin registry.heroku.com
+          echo $HEROKU_API_KEY | heroku auth:token
+
+      - name: Log in to Docker Hub
+        env:
+          DOCKER_USERNAME: ${{ secrets.DOCKER_HUB_USERNAME }}
+          DOCKER_HUB_ACCESS_TOKEN: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
+        run: |
+          echo "$DOCKER_HUB_ACCESS_TOKEN" | docker login --username $DOCKER_HUB_USERNAME --password-stdin
+
+      - name: Pull Docker image from Docker Hub
+        run: |
+          docker pull ${{ secrets.DOCKER_IMAGE }}
+      
+      - name: Tag Docker image for Heroku
+        run: |
+          docker tag ${{ secrets.DOCKER_IMAGE }} registry.heroku.com/${{ secrets.HEROKU_APP_NAME }}/web
 
       - name: Push Docker image to Heroku
-        run: docker push registry.heroku.com/${{ secrets.HEROKU_APP_NAME }}/web
+        run: |
+          docker push registry.heroku.com/${{ secrets.HEROKU_APP_NAME }}/web
 
-      - name: Release the image on Heroku
-        run: heroku container:release web --app ${{ secrets.HEROKU_APP_NAME }}
-
-      - name: Run database migrations (optional)
-        run: heroku run --app ${{ secrets.HEROKU_APP_NAME }} "python manage.py migrate"
+      - name: Release Docker image on Heroku
+        run: |
+          heroku container:release web --app ${{ secrets.HEROKU_APP_NAME }}

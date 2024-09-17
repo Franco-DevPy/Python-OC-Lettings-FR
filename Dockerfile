@@ -15,9 +15,13 @@ COPY . .
 
 # Définir les variables d'environnement
 ENV PYTHONUNBUFFERED=1
+ENV DJANGO_SETTINGS_MODULE=oc_lettings_site.settings
 
 # Exposer le port 8000
 EXPOSE 8000
+
+# Collecter les fichiers statiques
+RUN python manage.py collectstatic --noinput
 
 # Lancer le serveur Django
 CMD ["gunicorn", "--bind", "0.0.0.0:$PORT", "oc_lettings_site.wsgi:application"]
