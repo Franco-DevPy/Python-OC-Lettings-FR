@@ -82,7 +82,7 @@ Troubleshooting
         heroku logs --tail --app your-heroku-app-name
 
 Additional Resources
----------------
+--------------------
 
 - `Heroku Documentation <https://devcenter.heroku.com/>`
 - `GitHub Actions Documentation <https://docs.github.com/en/actions>`
