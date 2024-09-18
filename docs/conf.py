@@ -6,7 +6,7 @@
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
-project = "Python-OC-Lettings-FR"
+project = "Python-OC-Lettings-FR-Mickael-Fioretti"
 copyright = "2024, Mickael Fioretti"
 author = "Mickael Fioretti"
 release = "1.0.0"
