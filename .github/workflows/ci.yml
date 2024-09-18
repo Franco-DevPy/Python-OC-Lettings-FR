@@ -93,19 +93,34 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Install Heroku CLI
+      - name: Log in to Heroku Container Registry
+        env:
+          HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
         run: |
-          curl https://cli-assets.heroku.com/install.sh | sh
-          heroku --version
+          echo $HEROKU_API_KEY | docker login --username=_ --password-stdin registry.heroku.com
 
-      - name: Login to Heroku Container Registry
+      - name: Build Docker image
         run: |
-          heroku container:login
+          docker build -t registry.heroku.com/${{ secrets.HEROKU_APP_NAME }}/web .
 
-      - name: Deploy to Heroku
+      - name: Push Docker image to Heroku
         run: |
-          heroku container:push web --app python-oc-lettings-fr
-          heroku container:release web --app python-oc-lettings-fr
+          docker push registry.heroku.com/${{ secrets.HEROKU_APP_NAME }}/web
 
-      - name: Check Heroku Logs
-        run: heroku logs --tail --app python-oc-lettings-fr
+      - name: Release the app on Heroku
+        env:
+          HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
+        run: |
+          heroku container:release web --app ${{ secrets.HEROKU_APP_NAME }}
+
+      - name: Run database migrations
+        env:
+          HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
+        run: |
+          heroku run --app ${{ secrets.HEROKU_APP_NAME }} "python manage.py migrate"
+
+      - name: Collect static files
+        env:
+          HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
+        run: |
+          heroku run --app ${{ secrets.HEROKU_APP_NAME }} "python manage.py collectstatic --noinput"
