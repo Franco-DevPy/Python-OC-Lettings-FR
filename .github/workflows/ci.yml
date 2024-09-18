@@ -99,9 +99,13 @@ jobs:
         run: |
           echo $HEROKU_API_KEY | docker login --username=_ --password-stdin registry.heroku.com
 
-      - name: Build Docker image
+      - name: Pull Docker image from Docker Hub
         run: |
-          docker build -t registry.heroku.com/${{ secrets.HEROKU_APP_NAME }}/web .
+          docker pull ${{ secrets.DOCKER_USERNAME }}/django-app:latest
+
+      - name: Tag Docker image for Heroku
+        run: |
+          docker tag ${{ secrets.DOCKER_USERNAME }}/django-app:latest registry.heroku.com/${{ secrets.HEROKU_APP_NAME }}/web
 
       - name: Push Docker image to Heroku
         run: |
@@ -118,9 +122,3 @@ jobs:
           HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
         run: |
           heroku run --app ${{ secrets.HEROKU_APP_NAME }} "python manage.py migrate"
-
-      - name: Collect static files
-        env:
-          HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
-        run: |
-          heroku run --app ${{ secrets.HEROKU_APP_NAME }} "python manage.py collectstatic --noinput"
