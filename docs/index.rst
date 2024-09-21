@@ -7,7 +7,7 @@
 Python-OC-Lettings-FR
 ====================================
 
-Welcome to the documentation for **Python-OC-Lettings-FR**, a Django-based application designed to [describe the main purpose of your project].
+Welcome to the documentation for **Python-OC-Lettings-FR**.
 
 .. image:: _static/logo.png
    :alt: Project Logo
