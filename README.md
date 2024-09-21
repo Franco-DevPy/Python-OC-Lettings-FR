@@ -6,10 +6,10 @@ Site web d'Orange County Lettings
 
 ### Prérequis
 
-- Compte GitHub avec accès en lecture à ce repository
-- Git CLI
-- SQLite3 CLI
-- Interpréteur Python, version 3.6 ou supérieure
+-   Compte GitHub avec accès en lecture à ce repository
+-   Git CLI
+-   SQLite3 CLI
+-   Interpréteur Python, version 3.6 ou supérieure
 
 Dans le reste de la documentation sur le développement local, il est supposé que la commande `python` de votre OS shell exécute l'interpréteur Python ci-dessus (à moins qu'un environnement virtuel ne soit activé).
 
@@ -17,61 +17,116 @@ Dans le reste de la documentation sur le développement local, il est supposé q
 
 #### Cloner le repository
 
-- `cd /path/to/put/project/in`
-- `git clone https://github.com/OpenClassrooms-Student-Center/Python-OC-Lettings-FR.git`
+-   `cd /path/to/put/project/in`
+-   `git clone https://github.com/OpenClassrooms-Student-Center/Python-OC-Lettings-FR.git`
 
 #### Créer l'environnement virtuel
 
-- `cd /path/to/Python-OC-Lettings-FR`
-- `python -m venv venv`
-- `apt-get install python3-venv` (Si l'étape précédente comporte des erreurs avec un paquet non trouvé sur Ubuntu)
-- Activer l'environnement `source venv/bin/activate`
-- Confirmer que la commande `python` exécute l'interpréteur Python dans l'environnement virtuel
-`which python`
-- Confirmer que la version de l'interpréteur Python est la version 3.6 ou supérieure `python --version`
-- Confirmer que la commande `pip` exécute l'exécutable pip dans l'environnement virtuel, `which pip`
-- Pour désactiver l'environnement, `deactivate`
+-   `cd /path/to/Python-OC-Lettings-FR`
+-   `python -m venv venv`
+-   `apt-get install python3-venv` (Si l'étape précédente comporte des erreurs avec un paquet non trouvé sur Ubuntu)
+-   Activer l'environnement `source venv/bin/activate`
+-   Confirmer que la commande `python` exécute l'interpréteur Python dans l'environnement virtuel
+    `which python`
+-   Confirmer que la version de l'interpréteur Python est la version 3.6 ou supérieure `python --version`
+-   Confirmer que la commande `pip` exécute l'exécutable pip dans l'environnement virtuel, `which pip`
+-   Pour désactiver l'environnement, `deactivate`
 
 #### Exécuter le site
 
-- `cd /path/to/Python-OC-Lettings-FR`
-- `source venv/bin/activate`
-- `pip install --requirement requirements.txt`
-- `python manage.py runserver`
-- Aller sur `http://localhost:8000` dans un navigateur.
-- Confirmer que le site fonctionne et qu'il est possible de naviguer (vous devriez voir plusieurs profils et locations).
+-   `cd /path/to/Python-OC-Lettings-FR`
+-   `source venv/bin/activate`
+-   `pip install --requirement requirements.txt`
+-   `python manage.py runserver`
+-   Aller sur `http://localhost:8000` dans un navigateur.
+-   Confirmer que le site fonctionne et qu'il est possible de naviguer (vous devriez voir plusieurs profils et locations).
 
 #### Linting
 
-- `cd /path/to/Python-OC-Lettings-FR`
-- `source venv/bin/activate`
-- `flake8`
+-   `cd /path/to/Python-OC-Lettings-FR`
+-   `source venv/bin/activate`
+-   `flake8`
 
 #### Tests unitaires
 
-- `cd /path/to/Python-OC-Lettings-FR`
-- `source venv/bin/activate`
-- `pytest`
+-   `cd /path/to/Python-OC-Lettings-FR`
+-   `source venv/bin/activate`
+-   `pytest`
 
 #### Base de données
 
-- `cd /path/to/Python-OC-Lettings-FR`
-- Ouvrir une session shell `sqlite3`
-- Se connecter à la base de données `.open oc-lettings-site.sqlite3`
-- Afficher les tables dans la base de données `.tables`
-- Afficher les colonnes dans le tableau des profils, `pragma table_info(Python-OC-Lettings-FR_profile);`
-- Lancer une requête sur la table des profils, `select user_id, favorite_city from
-  Python-OC-Lettings-FR_profile where favorite_city like 'B%';`
-- `.quit` pour quitter
+-   `cd /path/to/Python-OC-Lettings-FR`
+-   Ouvrir une session shell `sqlite3`
+-   Se connecter à la base de données `.open oc-lettings-site.sqlite3`
+-   Afficher les tables dans la base de données `.tables`
+-   Afficher les colonnes dans le tableau des profils, `pragma table_info(Python-OC-Lettings-FR_profile);`
+-   Lancer une requête sur la table des profils, `select user_id, favorite_city from
+Python-OC-Lettings-FR_profile where favorite_city like 'B%';`
+-   `.quit` pour quitter
 
 #### Panel d'administration
 
-- Aller sur `http://localhost:8000/admin`
-- Connectez-vous avec l'utilisateur `admin`, mot de passe `Abc1234!`
+-   Aller sur `http://localhost:8000/admin`
+-   Connectez-vous avec l'utilisateur `admin`, mot de passe `Abc1234!`
 
 ### Windows
 
 Utilisation de PowerShell, comme ci-dessus sauf :
 
-- Pour activer l'environnement virtuel, `.\venv\Scripts\Activate.ps1` 
-- Remplacer `which <my-command>` par `(Get-Command <my-command>).Path`
+-   Pour activer l'environnement virtuel, `.\venv\Scripts\Activate.ps1`
+-   Remplacer `which <my-command>` par `(Get-Command <my-command>).Path`
+
+## Déploiement
+
+Le déploiement est effectué automatiquement par GitHub Actions. Les étapes de déploiement sont les suivantes :
+
+1.  Lorsqu'un commit est poussé sur la branche `deploy-prod`, GitHub Actions exécute les tests unitaires et le linting.
+
+2.  Si les tests unitaires et le linting passent, une image Docker est construite et poussée sur Docker Hub.
+
+3.  L'image Docker est ensuite déployée sur Heroku. Les étapes spécifiques sont les suivantes :
+
+    -   **Checkout code** : Récupère le code du dépôt GitHub.
+    -   **Set up Python** : Configure Python 3.9 sur le runner.
+    -   **Install dependencies** : Installe les packages Python requis.
+    -   **Run database migrations** : Applique les migrations de base de données en attente.
+    -   **Run flake8** : Vérifie le code pour la conformité PEP8.
+    -   **Run tests** : Exécute les tests Django et génère un rapport de couverture.
+    -   **Build Docker image** : Construit l'image Docker pour l'application.
+    -   **Push Docker image** : Pousse l'image Docker sur Docker Hub.
+    -   **Log in to Heroku Container Registry** : Authentifie avec Heroku.
+    -   **Pull Docker image from Docker Hub** : Récupère l'image Docker depuis Docker Hub.
+    -   **Tag Docker image for Heroku** : Tag l'image Docker pour le déploiement sur Heroku.
+    -   **Push Docker image to Heroku** : Pousse l'image Docker sur Heroku.
+    -   **Release the app on Heroku** : Déploie l'image Docker sur l'application Heroku.
+    -   **Run database migrations on Heroku** : Applique les migrations de base de données sur Heroku.
+
+4.  Après le déploiement, l'application est surveillée pour s'assurer qu'elle fonctionne correctement. Les journaux peuvent être consultés via l'interface Heroku ou en utilisant la CLI Heroku :
+
+    ```bash
+    heroku logs --tail --app your-heroku-app-name
+    ```
+
+### Configuration des Secrets GitHub
+
+Pour que le pipeline CI/CD fonctionne correctement, les secrets suivants doivent être configurés dans les paramètres de votre dépôt GitHub (`Settings > Secrets and variables > Actions > New repository secret`) :
+
+-   `DOCKER_USERNAME` : Votre nom d'utilisateur Docker Hub.
+-   `DOCKER_PASSWORD` : Votre mot de passe Docker Hub.
+-   `HEROKU_API_KEY` : Votre clé API Heroku.
+-   `HEROKU_APP_NAME` : Le nom de votre application Heroku.
+
+### Déclenchement Manuel
+
+Vous pouvez également déclencher manuellement le pipeline en utilisant l'interface GitHub Actions sous l'onglet `Actions` de votre dépôt.
+
+### Ressources Supplémentaires
+
+-   [Documentation GitHub Actions](https://docs.github.com/en/actions)
+-   [Documentation Docker](https://docs.docker.com/)
+-   [Docker Hub](https://hub.docker.com/)
+-   [Documentation Heroku](https://devcenter.heroku.com/)
+
+---
+
+En suivant ces étapes, vous pouvez automatiser le déploiement de votre application Django sur Heroku en utilisant GitHub Actions et Docker.
