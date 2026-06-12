@@ -1,4 +1,6 @@
 from pathlib import Path
+import os
+import sentry_sdk
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -115,3 +117,17 @@ STATICFILES_DIRS = [BASE_DIR / "static"]
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# Sentry Configuration
+SENTRY_DSN = os.environ.get(
+    'SENTRY_DSN',
+    'https://f26e032e8666f2055ba7e0a03e59a0d3@o4511191704535040'
+    '.ingest.de.sentry.io/4511551781011536'
+)
+
+sentry_sdk.init(
+    dsn=SENTRY_DSN,
+    traces_sample_rate=1.0,
+    profiles_sample_rate=1.0,
+    send_default_pii=True,
+)
