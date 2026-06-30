@@ -1,0 +1,12 @@
+version: '3'
+
+services:
+  lettings:
+    container_name: lettings
+    ports:
+      - "8000:8000"
+    volumes:
+      - .:/app  # Utilisation d'un volume Docker pour synchroniser le code source
+    build:
+      context: .
+      dockerfile: Dockerfile

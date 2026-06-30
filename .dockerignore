@@ -1,0 +1,22 @@
+# Secrets — jamais dans l'image Docker
+.env
+
+# Environnement virtuel — les dépendances sont installées via pip dans le Dockerfile
+venv/
+
+# Fichiers Python compilés — régénérés automatiquement
+__pycache__/
+*.pyc
+*.pyo
+
+# Tests et couverture — inutiles en production
+htmlcov/
+.coverage
+.pytest_cache/
+
+# Git
+.git/
+.gitignore
+
+# Fichiers de documentation
+DOC/
