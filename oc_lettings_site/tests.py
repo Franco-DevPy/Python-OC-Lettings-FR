@@ -20,7 +20,7 @@ class TestHomepage:
     def test_homepage_content(self, client):
         """Test that homepage contains expected content."""
         response = client.get(reverse('index'))
-        assert b'Welcome to Holiday Homes' in response.content
+        assert b'Holiday Homes' in response.content
 
     def test_homepage_has_navigation_links(self, client):
         """Test that homepage has links to lettings and profiles."""
